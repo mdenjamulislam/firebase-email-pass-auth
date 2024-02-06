@@ -1,16 +1,19 @@
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import auth from "../../firebase/firebase.config"
 import { useState } from "react"
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5"
 
 const Register = () => {
     const [registerError, setRegisterError] = useState("")
     const [registerSuccess, setRegisterSuccess] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
     const handleRegister = (e) => {
         e.preventDefault()
         const email = e.target.email.value
         const password = e.target.pass.value
-        console.log(email, password)
+        const accepted = e.target.terms.checked;
+        console.log(email, password, accepted)
 
         // reser error & success message
         setRegisterError("")
@@ -22,6 +25,9 @@ const Register = () => {
         } else if (!/[A-Z]/.test(password)) {
             setRegisterError("Your password not full-fill our requirement")
             return
+        } else if (!accepted) {
+            setRegisterError("Please accepted our terms and conditions.");
+            return;
         }
 
         // Create user
@@ -41,7 +47,21 @@ const Register = () => {
                 <h2 className="text-2xl font-semibold text-center pb-5">Registration</h2>
                 <form onSubmit={handleRegister} className="flex flex-col gap-3">
                     <input type="email" name="email" placeholder="Type here" required className="input input-bordered input-success w-full" />
-                    <input type="password" name="pass" placeholder="Password" required className="input input-bordered input-success w-full" />
+                    <div className="flex items-center relative">
+                        <input type={showPassword ? "text" : "password"} name="pass" placeholder="Password" required className="input input-bordered input-success w-full" />
+                        
+                        <button className="absolute right-2" onClick={() => setShowPassword(!showPassword)}>
+                            {
+                                showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />
+                            }
+                        </button>
+                    </div>
+                    <div className="form-control">
+                        <label className="cursor-pointer flex items-center gap-2">
+                            <input type="checkbox" name="terms" id="terms" className="checkbox checkbox-accent" />
+                            <span className="label-text">I agree with the terms & conditions</span>
+                        </label>
+                    </div>
                     <button className="btn btn-success">Register</button>
                 </form>
                 {registerError && <p className="text-red-500">{registerError}</p>}

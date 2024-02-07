@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../../firebase/firebase.config";
 import { useState } from "react";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
@@ -11,10 +11,11 @@ const Register = () => {
 
     const handleRegister = (e) => {
         e.preventDefault();
+        const name = e.target.name.value;
         const email = e.target.email.value;
         const password = e.target.pass.value;
         const accepted = e.target.terms.checked;
-        console.log(email, password, accepted);
+        console.log(name, email, password, accepted);
 
         // reser error & success message
         setRegisterError("");
@@ -37,6 +38,19 @@ const Register = () => {
                 console.log(result.user);
                 setRegisterSuccess("Registration Successfully!");
 
+                // Update user Profile
+                updateProfile(result.user, {
+                    displayName: name,
+                    photoURL: "https://example.com/jane-q-user/profile.jpg",
+                })
+                    .then(() => {
+                        console.log("Profile Updated");
+                    })
+                    .catch((error) => {
+                        setRegisterError("User Profile Not Updated.");
+                    });
+
+                // Email varification when create new account
                 sendEmailVerification(result.user).then(() => {
                     alert("Verification email send to ", email);
                 });
